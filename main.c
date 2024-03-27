@@ -17,17 +17,27 @@ char* getErrorMessage(const char* error_code) {
     char *error_message = NULL;
 
     while (fgets(buffer, sizeof(buffer), file) != NULL) {
-        char *code_ptr = strstr(buffer, error_code);
+        char *code_ptr = strstr(buffer, "\"Code\":");
         if (code_ptr != NULL) {
-            char *message_ptr = strstr(buffer, "\"") + 1;
-            char *end_ptr = strstr(message_ptr, "\"");
-            size_t message_length = end_ptr - message_ptr;
-
-            error_message = (char*)malloc((message_length + 1) * sizeof(char));
-            strncpy(error_message, message_ptr, message_length);
-            error_message[message_length] = '\0';
-
-            break;
+            code_ptr += strlen("\"Code\":");
+            if (strncmp(code_ptr, error_code, strlen(error_code)) == 0) {
+                char *message_ptr = strstr(buffer, "\"Message\":");
+                if (message_ptr != NULL) {
+                    message_ptr += strlen("\"Message\":");
+                    message_ptr = strchr(message_ptr, '\"');
+                    if (message_ptr != NULL) {
+                        message_ptr++;
+                        char *end_ptr = strchr(message_ptr, '\"');
+                        if (end_ptr != NULL) {
+                            size_t message_length = end_ptr - message_ptr;
+                            error_message = (char*)malloc((message_length + 1) * sizeof(char));
+                            strncpy(error_message, message_ptr, message_length);
+                            error_message[message_length] = '\0';
+                            break;
+                        }
+                    }
+                }
+            }
         }
     }
 
