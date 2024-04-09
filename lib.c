@@ -16,19 +16,15 @@ int main() {
 
     char line[MAX_LINE_LENGTH];
     while (fgets(line, sizeof(line), file)) {
-        // Tokenize the line to extract error codes within the square brackets
         char *errorStart = strchr(line, '[');
         if (errorStart != NULL) {
-            // Locate the start of the error codes and extract them
-            errorStart++; // Move past '['
+            errorStart++;
             char *errorEnd = strchr(errorStart, ']');
             if (errorEnd != NULL) {
-                *errorEnd = '\0'; // Null-terminate to isolate error codes
+                *errorEnd = '\0';
                 char *errorCodes = strtok(errorStart, ", ");
                 
-                // Process each error code
                 while (errorCodes != NULL) {
-                    // Call function from another C file to get error message
                     char *errorMessage = getErrorMessage(errorCodes);
                     if (errorMessage != NULL) {
                         printf("Error Code %s: %s\n", errorCodes, errorMessage);
