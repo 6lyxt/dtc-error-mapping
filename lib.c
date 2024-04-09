@@ -5,6 +5,46 @@
 #define JSON_FILE "dtc.json"
 #define MAX_ERROR_CODE_LENGTH 10
 #define MAX_ERROR_MESSAGE_LENGTH 100
+#define MAX_LINE_LENGTH 256
+
+int main() {
+    FILE *file = fopen("data.txt", "r");
+    if (file == NULL) {
+        perror("Error opening file");
+        return 1;
+    }
+
+    char line[MAX_LINE_LENGTH];
+    while (fgets(line, sizeof(line), file)) {
+        // Tokenize the line to extract error codes within the square brackets
+        char *errorStart = strchr(line, '[');
+        if (errorStart != NULL) {
+            // Locate the start of the error codes and extract them
+            errorStart++; // Move past '['
+            char *errorEnd = strchr(errorStart, ']');
+            if (errorEnd != NULL) {
+                *errorEnd = '\0'; // Null-terminate to isolate error codes
+                char *errorCodes = strtok(errorStart, ", ");
+                
+                // Process each error code
+                while (errorCodes != NULL) {
+                    // Call function from another C file to get error message
+                    char *errorMessage = getErrorMessage(errorCodes);
+                    if (errorMessage != NULL) {
+                        printf("Error Code %s: %s\n", errorCodes, errorMessage);
+                    } else {
+                        printf("Error Code %s: Unknown error\n", errorCodes);
+                    }
+                    errorCodes = strtok(NULL, ", ");
+                }
+            }
+        }
+    }
+
+    fclose(file);
+    return 0;
+}
+
 
 char* getErrorMessage(const char* error_code) {
     FILE *file = fopen(JSON_FILE, "r");
