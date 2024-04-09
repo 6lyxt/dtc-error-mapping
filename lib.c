@@ -44,20 +44,3 @@ char* getErrorMessage(const char* error_code) {
     fclose(file);
     return error_message;
 }
-
-int main() {
-    char error_code[MAX_ERROR_CODE_LENGTH];
-
-    printf("Enter the error code (e.g., P0379): ");
-    scanf("%s", error_code);
-
-    char *error_message = getErrorMessage(error_code);
-    if (error_message != NULL) {
-        printf("Error Message: %s\n", error_message);
-        free(error_message);
-    } else {
-        printf("Error: Error code '%s' not found.\n", error_code);
-    }
-
-    return 0;
-}
